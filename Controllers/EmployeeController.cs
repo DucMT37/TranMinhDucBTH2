@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TranMinhDucBTH2.Controllers
 {
-    public class StudentController : Controller
+    public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public StudentController (ApplicationDbContext context)
+        public EmployeeController (ApplicationDbContext context)
         {
             _context = context;
         }
         public async Task<IActionResult> Index()
         {
-            var model = await _context.Student.ToListAsync();
+            var model = await _context.Employee.ToListAsync();
             return View(model);
         }
 
@@ -25,15 +25,15 @@ namespace TranMinhDucBTH2.Controllers
         
         [HttpPost]
 
-        public async Task<IActionResult> Create(Student std)
+        public async Task<IActionResult> Create(Employee epl)
         {
             if(ModelState.IsValid)
             {
-                _context.Add(std);
+                _context.Add(epl);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(std);
+            return View(epl);
         }
         public async Task<IActionResult> Edit(string id)
         {
@@ -42,21 +42,21 @@ namespace TranMinhDucBTH2.Controllers
                 return View("NotFound");
             }
 
-            var student = await _context.Students.FindAsync(id);
-            if (student == null)
+            var employee = await _context.Employee.FindAsync(id);
+            if (employee == null)
             {
                 return View("NotFound");
             }
-            return View(student);
+            return View(employee);
         
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Edit(string id, [Bind("StudentID,StudentName")] Student std)
+        public async Task<IActionResult> Edit(string id, [Bind("EmployeeID,EmployeeName")] Employee epl)
         {
-            if (id ! == std.StudentID)
+            if (id ! == epl.EmployeeID)
             {
                 return View("NotFound");
             }
@@ -65,12 +65,12 @@ namespace TranMinhDucBTH2.Controllers
             {
                 try
                 {
-                    _context.Update(std);
+                    _context.Update(epl);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StudentExists(std.StudentID))
+                    if (!EmployeeExists(epl.EmployeeID))
                     {
                         return View("NotFound");
                     }
@@ -81,7 +81,7 @@ namespace TranMinhDucBTH2.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(std);
+            return View(epl);
         
         }
 
@@ -92,14 +92,14 @@ namespace TranMinhDucBTH2.Controllers
                 return View("NotFound");
             }
 
-            var std = await _context.Students
-                .FirstOrDefaultAsync(m => m.StudentID == id);
-            if (std == null)
+            var epl = await _context.Employee
+                .FirstOrDefaultAsync(m => m.EmployeeID == id);
+            if (epl == null)
             {
                 return View("NotFound");
             }
 
-            return View(std);
+            return View(epl);
 
         }
 
@@ -108,8 +108,8 @@ namespace TranMinhDucBTH2.Controllers
 
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var std = await _context.Student.FindAsync(id);
-            _context.Student.Remove(std);
+            var epl = await _context.Employee.FindAsync(id);
+            _context.Employee.Remove(epl);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -121,19 +121,19 @@ namespace TranMinhDucBTH2.Controllers
 
         [HttpPost]
 
-        public async Task<IActionResult> Create(Student std)
+        public async Task<IActionResult> Create(Employee epl)
         {
             if(ModelState.IsValid)
             {
-                _context.Add(std);
+                _context.Add(epl);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(std);
+            return View(epl);
         }
-        private bool StudentExists(string id)
+        private bool EmployeeExists(string id)
         {
-            return _context.Students.Any(e => e.StudentID == id);
+            return _context.Employee.Any(e => e.EmployeeID == id);
         }
     }
 }

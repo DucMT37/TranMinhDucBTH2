@@ -6,12 +6,17 @@
     <tr>
         <th>EmployeeID</th>
         <th>EmployeeName</th>  
+        <th></th>
     </tr>
 @foreach (var item in Model)
 {
     <tr>
         <td>@Html.DisplayFor(m =>item.EmployeeID)</td>
         <td>@Html.DisplayFor(m =>item.EmployeeName)</td>
+        <td>
+            <a asp-action="Edit" asp-route-id="item.EmployeeID">Sua</a>
+            <a asp-action="Delete" asp-route-id="item.EmployeeID">Xoa</a>
+        </td>
     </tr>
 }
 </table>

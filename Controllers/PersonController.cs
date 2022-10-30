@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TranMinhDucBTH2.Controllers
 {
-    public class StudentController : Controller
+    public class PersonController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public StudentController (ApplicationDbContext context)
+        public PersonController (ApplicationDbContext context)
         {
             _context = context;
         }
         public async Task<IActionResult> Index()
         {
-            var model = await _context.Student.ToListAsync();
+            var model = await _context.Person.ToListAsync();
             return View(model);
         }
 
@@ -25,15 +25,15 @@ namespace TranMinhDucBTH2.Controllers
         
         [HttpPost]
 
-        public async Task<IActionResult> Create(Student std)
+        public async Task<IActionResult> Create(Person prs)
         {
             if(ModelState.IsValid)
             {
-                _context.Add(std);
+                _context.Add(prs);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(std);
+            return View(prs);
         }
         public async Task<IActionResult> Edit(string id)
         {
@@ -42,21 +42,21 @@ namespace TranMinhDucBTH2.Controllers
                 return View("NotFound");
             }
 
-            var student = await _context.Students.FindAsync(id);
-            if (student == null)
+            var person = await _context.Person.FindAsync(id);
+            if (Person == null)
             {
                 return View("NotFound");
             }
-            return View(student);
+            return View(Person);
         
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Edit(string id, [Bind("StudentID,StudentName")] Student std)
+        public async Task<IActionResult> Edit(string id, [Bind("PersonID,PersonName")] Person prs)
         {
-            if (id ! == std.StudentID)
+            if (id ! == prs.PersonID)
             {
                 return View("NotFound");
             }
@@ -65,12 +65,12 @@ namespace TranMinhDucBTH2.Controllers
             {
                 try
                 {
-                    _context.Update(std);
+                    _context.Update(prs);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StudentExists(std.StudentID))
+                    if (!PersonExists(prs.PersonID))
                     {
                         return View("NotFound");
                     }
@@ -81,7 +81,7 @@ namespace TranMinhDucBTH2.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(std);
+            return View(prs);
         
         }
 
@@ -92,14 +92,14 @@ namespace TranMinhDucBTH2.Controllers
                 return View("NotFound");
             }
 
-            var std = await _context.Students
-                .FirstOrDefaultAsync(m => m.StudentID == id);
-            if (std == null)
+            var prs = await _context.Person
+                .FirstOrDefaultAsync(m => m.PersonID == id);
+            if (prs == null)
             {
                 return View("NotFound");
             }
 
-            return View(std);
+            return View(prs);
 
         }
 
@@ -108,8 +108,8 @@ namespace TranMinhDucBTH2.Controllers
 
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var std = await _context.Student.FindAsync(id);
-            _context.Student.Remove(std);
+            var prs = await _context.Person.FindAsync(id);
+            _context.Person.Remove(prs);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -121,19 +121,19 @@ namespace TranMinhDucBTH2.Controllers
 
         [HttpPost]
 
-        public async Task<IActionResult> Create(Student std)
+        public async Task<IActionResult> Create(Person prs)
         {
             if(ModelState.IsValid)
             {
-                _context.Add(std);
+                _context.Add(prs);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(std);
+            return View(prs);
         }
-        private bool StudentExists(string id)
+        private bool PersonExists(string id)
         {
-            return _context.Students.Any(e => e.StudentID == id);
+            return _context.Person.Any(e => e.PersonID == id);
         }
     }
 }
