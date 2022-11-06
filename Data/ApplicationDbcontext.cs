@@ -10,7 +10,8 @@ namespace TranMinhDucBTH2.Data
 
         }
 
-        public DbSet<Employee> Employee {get; set; }
+        public DbSet<Student> Student {get; set; }
+        public DbSet<TranMinhDucBTH2.Models.Employee> Employee {get; set; }
         public DbSet<Person> Person {get; set; }
         public DbSet<Customer> Customer {get; set; }
     }

@@ -1,139 +1,74 @@
-using TranMinhDucBTH2.Data;
 using TranMinhDucBTH2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TranMinhDucBTH2.Models.Process;
+
 
 namespace TranMinhDucBTH2.Controllers
 {
     public class PersonController : Controller
     {
         private readonly ApplicationDbContext _context;
+
+        private ExcelProssm _excelProcess = new ExcelProcess();
+
         public PersonController (ApplicationDbContext context)
         {
             _context = context;
         }
+
         public async Task<IActionResult> Index()
         {
-            var model = await _context.Person.ToListAsync();
-            return View(model);
+            return View(await _context.Person.ToListAsync());
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Upload()
         {
             return View();
         }
-        
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Person prs)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(prs);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(prs);
-        }
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var person = await _context.Person.FindAsync(id);
-            if (Person == null)
-            {
-                return View("NotFound");
-            }
-            return View(Person);
-        
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Edit(string id, [Bind("PersonID,PersonName")] Person prs)
+        public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (id ! == prs.PersonID)
+            if (file! = null)
             {
-                return View("NotFound");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                string fileExtension = Path.GetExtension(file.FileName);
+                if (fileExtension != "xls" && fileExtension != "xlsx")
                 {
-                    _context.Update(prs);
-                    await _context.SaveChangesAsync();
+                    ModelState.AddModelErros("", "Please choose excel file to upload!");
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!PersonExists(prs.PersonID))
+                    var fileName = DateTime.Now.ToShortTimeString() + fileExtension;
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uploads/Excels", fileName);
+                    var fileLocation = new FileInfo(filePath).ToString(); 
+                    using (var stream = new FileStream(filePath,FileModel>Create))
                     {
-                        return View("NotFound");
-                    }
-                    else
-                    {
-                        throw;
+                        await file.CopyToAsync(Stream);
+                        var dt = _excelProcess.ExcelPackageToDataTable(fileLocation);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            var per = new Person();
+
+                            per.PerID = dt.Rows[i][0].ToString();
+                            per.PerName = dt.Rows[i][0].ToString();
+                            per.PerAddress = dt.Rows[i][0].ToString();
+
+                            _context.Person.Add(per);
+                        }
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(prs);
-        
-        }
-
-         public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var prs = await _context.Person
-                .FirstOrDefaultAsync(m => m.PersonID == id);
-            if (prs == null)
-            {
-                return View("NotFound");
-            }
-
-            return View(prs);
-
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var prs = await _context.Person.FindAsync(id);
-            _context.Person.Remove(prs);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Create()
-        {
             return View();
         }
-
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Person prs)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(prs);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(prs);
-        }
+        
         private bool PersonExists(string id)
         {
-            return _context.Person.Any(e => e.PersonID == id);
+            return _context.Person.Any(e => e.PerID == id);
         }
+
     }
 }

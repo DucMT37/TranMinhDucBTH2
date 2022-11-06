@@ -1,10 +1,16 @@
+using System.ConponentModel.DataAnnotaions;
+
 namespace TranMinhDucBTH2.Models
 {
     public class Person
     {
-        public string PersonID {get; set; }
+        [Key]
 
-        public string PersonName {get; set; }
+        public string PerID {get; set; }
+
+        public string PerName {get; set; }
+
+        public string Address {get; set; }
 
     }
 }

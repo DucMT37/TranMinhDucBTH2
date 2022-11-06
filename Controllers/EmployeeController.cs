@@ -1,139 +1,74 @@
-using TranMinhDucBTH2.Data;
 using TranMinhDucBTH2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TranMinhDucBTH2.Models.Process;
+
 
 namespace TranMinhDucBTH2.Controllers
 {
     public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _context;
+
+        private ExcelProssm _excelProcess = new ExcelProcess();
+
         public EmployeeController (ApplicationDbContext context)
         {
             _context = context;
         }
+
         public async Task<IActionResult> Index()
         {
-            var model = await _context.Employee.ToListAsync();
-            return View(model);
+            return View(await _context.Employee.ToListAsync());
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Upload()
         {
             return View();
         }
-        
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Employee epl)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(epl);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(epl);
-        }
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var employee = await _context.Employee.FindAsync(id);
-            if (employee == null)
-            {
-                return View("NotFound");
-            }
-            return View(employee);
-        
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Edit(string id, [Bind("EmployeeID,EmployeeName")] Employee epl)
+        public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (id ! == epl.EmployeeID)
+            if (file! = null)
             {
-                return View("NotFound");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                string fileExtension = Path.GetExtension(file.FileName);
+                if (fileExtension != "xls" && fileExtension != "xlsx")
                 {
-                    _context.Update(epl);
-                    await _context.SaveChangesAsync();
+                    ModelState.AddModelErros("", "Please choose excel file to upload!");
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!EmployeeExists(epl.EmployeeID))
+                    var fileName = DateTime.Now.ToShortTimeString() + fileExtension;
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uploads/Excels", fileName);
+                    var fileLocation = new FileInfo(filePath).ToString(); 
+                    using (var stream = new FileStream(filePath,FileModel>Create))
                     {
-                        return View("NotFound");
-                    }
-                    else
-                    {
-                        throw;
+                        await file.CopyToAsync(Stream);
+                        var dt = _excelProcess.ExcelPackageToDataTable(fileLocation);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            var emp = new Employee();
+
+                            emp.EmpID = dt.Rows[i][0].ToString();
+                            emp.EmpName = dt.Rows[i][0].ToString();
+                            emp.EmpAddress = dt.Rows[i][0].ToString();
+
+                            _context.Employee.Add(emp);
+                        }
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(epl);
-        
-        }
-
-         public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var epl = await _context.Employee
-                .FirstOrDefaultAsync(m => m.EmployeeID == id);
-            if (epl == null)
-            {
-                return View("NotFound");
-            }
-
-            return View(epl);
-
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var epl = await _context.Employee.FindAsync(id);
-            _context.Employee.Remove(epl);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Create()
-        {
             return View();
         }
-
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Employee epl)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(epl);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(epl);
-        }
+        
         private bool EmployeeExists(string id)
         {
-            return _context.Employee.Any(e => e.EmployeeID == id);
+            return _context.Employee.Any(e => e.EmpID == id);
         }
+
     }
 }

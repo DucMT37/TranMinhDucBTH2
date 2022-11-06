@@ -1,139 +1,74 @@
-using TranMinhDucBTH2.Data;
 using TranMinhDucBTH2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TranMinhDucBTH2.Models.Process;
+
 
 namespace TranMinhDucBTH2.Controllers
 {
     public class StudentController : Controller
     {
         private readonly ApplicationDbContext _context;
+
+        private ExcelProssm _excelProcess = new ExcelProcess();
+
         public StudentController (ApplicationDbContext context)
         {
             _context = context;
         }
+
         public async Task<IActionResult> Index()
         {
-            var model = await _context.Student.ToListAsync();
-            return View(model);
+            return View(await _context.Student.ToListAsync());
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Upload()
         {
             return View();
         }
-        
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Student std)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(std);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(std);
-        }
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var student = await _context.Students.FindAsync(id);
-            if (student == null)
-            {
-                return View("NotFound");
-            }
-            return View(student);
-        
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Edit(string id, [Bind("StudentID,StudentName")] Student std)
+        public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (id ! == std.StudentID)
+            if (file! = null)
             {
-                return View("NotFound");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                string fileExtension = Path.GetExtension(file.FileName);
+                if (fileExtension != "xls" && fileExtension != "xlsx")
                 {
-                    _context.Update(std);
-                    await _context.SaveChangesAsync();
+                    ModelState.AddModelErros("", "Please choose excel file to upload!");
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!StudentExists(std.StudentID))
+                    var fileName = DateTime.Now.ToShortTimeString() + fileExtension;
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uploads/Excels", fileName);
+                    var fileLocation = new FileInfo(filePath).ToString(); 
+                    using (var stream = new FileStream(filePath,FileModel>Create))
                     {
-                        return View("NotFound");
-                    }
-                    else
-                    {
-                        throw;
+                        await file.CopyToAsync(Stream);
+                        var dt = _excelProcess.ExcelPackageToDataTable(fileLocation);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            var std = new Student();
+
+                            std.StdID = dt.Rows[i][0].ToString();
+                            std.StdName = dt.Rows[i][0].ToString();
+                            std.StdAddress = dt.Rows[i][0].ToString();
+
+                            _context.Student.Add(std);
+                        }
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(std);
-        
-        }
-
-         public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var std = await _context.Students
-                .FirstOrDefaultAsync(m => m.StudentID == id);
-            if (std == null)
-            {
-                return View("NotFound");
-            }
-
-            return View(std);
-
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var std = await _context.Student.FindAsync(id);
-            _context.Student.Remove(std);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Create()
-        {
             return View();
         }
-
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Student std)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(std);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(std);
-        }
+        
         private bool StudentExists(string id)
         {
-            return _context.Students.Any(e => e.StudentID == id);
+            return _context.Student.Any(e => e.StdID == id);
         }
+
     }
 }

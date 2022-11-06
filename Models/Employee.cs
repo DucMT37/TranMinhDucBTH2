@@ -1,10 +1,16 @@
+using System.ConponentModel.DataAnnotaions;
+
 namespace TranMinhDucBTH2.Models
 {
     public class Employee
     {
-        public string EmployeeID {get; set; }
+        [Key]
 
-        public string EmployeeName {get; set; }
+        public string EmpID {get; set; }
+
+        public string EmpName {get; set; }
+
+        public string Address {get; set; }
 
     }
 }

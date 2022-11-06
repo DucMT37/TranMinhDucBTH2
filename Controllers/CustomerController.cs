@@ -1,139 +1,74 @@
-using TranMinhDucBTH2.Data;
 using TranMinhDucBTH2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TranMinhDucBTH2.Models.Process;
+
 
 namespace TranMinhDucBTH2.Controllers
 {
     public class CustomerController : Controller
     {
         private readonly ApplicationDbContext _context;
+
+        private ExcelProssm _excelProcess = new ExcelProcess();
+
         public CustomerController (ApplicationDbContext context)
         {
             _context = context;
         }
+
         public async Task<IActionResult> Index()
         {
-            var model = await _context.Customer.ToListAsync();
-            return View(model);
+            return View(await _context.Customer.ToListAsync());
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Upload()
         {
             return View();
         }
-        
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Customer cst)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(cst);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(cst);
-        }
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var Customer = await _context.Customer.FindAsync(id);
-            if (Customer == null)
-            {
-                return View("NotFound");
-            }
-            return View(Customer);
-        
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Edit(string id, [Bind("CustomerID,CustomerName")] Customer cst)
+        public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (id ! == cst.CustomerID)
+            if (file! = null)
             {
-                return View("NotFound");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                string fileExtension = Path.GetExtension(file.FileName);
+                if (fileExtension != "xls" && fileExtension != "xlsx")
                 {
-                    _context.Update(cst);
-                    await _context.SaveChangesAsync();
+                    ModelState.AddModelErros("", "Please choose excel file to upload!");
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!CustomerExists(cst.CustomerID))
+                    var fileName = DateTime.Now.ToShortTimeString() + fileExtension;
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uploads/Excels", fileName);
+                    var fileLocation = new FileInfo(filePath).ToString(); 
+                    using (var stream = new FileStream(filePath,FileModel>Create))
                     {
-                        return View("NotFound");
-                    }
-                    else
-                    {
-                        throw;
+                        await file.CopyToAsync(Stream);
+                        var dt = _excelProcess.ExcelPackageToDataTable(fileLocation);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            var cus = new Customer();
+
+                            cus.CusID = dt.Rows[i][0].ToString();
+                            cus.CusName = dt.Rows[i][0].ToString();
+                            cus.CusAddress = dt.Rows[i][0].ToString();
+
+                            _context.Customer.Add(cus);
+                        }
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(cst);
-        
-        }
-
-         public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return View("NotFound");
-            }
-
-            var cst = await _context.Customer
-                .FirstOrDefaultAsync(m => m.CustomerID == id);
-            if (cst == null)
-            {
-                return View("NotFound");
-            }
-
-            return View(cst);
-
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var cst = await _context.Customer.FindAsync(id);
-            _context.Customer.Remove(cst);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Create()
-        {
             return View();
         }
-
-        [HttpPost]
-
-        public async Task<IActionResult> Create(Customer cst)
-        {
-            if(ModelState.IsValid)
-            {
-                _context.Add(cst);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(epl);
-        }
+        
         private bool CustomerExists(string id)
         {
-            return _context.Customer.Any(e => e.CustomerID == id);
+            return _context.Customer.Any(e => e.CusID == id);
         }
+
     }
 }

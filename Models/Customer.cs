@@ -1,10 +1,16 @@
+using System.ConponentModel.DataAnnotaions;
+
 namespace TranMinhDucBTH2.Models
 {
     public class Customer
     {
-        public string CustomerID {get; set; }
+        [Key]
 
-        public string CustomerName {get; set; }
+        public string CusID {get; set; }
+
+        public string CusName {get; set; }
+
+        public string Address {get; set; }
 
     }
 }

@@ -1,22 +1,42 @@
 @model IEnumerable<TranMinhDucBTH2.Models.Person>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
 <p>
-    <a class="btn btn-success" asp-action="Create"> Create a new Person</a>
+    <a asp-action="Create"> Create New</a>
 </p>
-<table class="table table-all">
-    <tr>
-        <th>PersonID</th>
-        <th>PersonName</th>  
-        <th></th>
-    </tr>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PerName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
 @foreach (var item in Model)
 {
     <tr>
-        <td>@Html.DisplayFor(m =>item.PersonID)</td>
-        <td>@Html.DisplayFor(m =>item.PersonName)</td>
         <td>
-            <a asp-action="Edit" asp-route-id="item.PersonID">Sua</a>
-            <a asp-action="Delete" asp-route-id="item.PersonID">Xoa</a>
+            @Html.DisplayNameFor(model => model.PerName)
         </td>
+        <td>
+            @Html.DisplayNameFor(model => model.Address)
+        </td>
+        <td>
+            <a asp-action="Edit" asp-route-id="@item.PerID">Edit</a>
+            <a asp-action="Details" asp-route-id="@item.PerID">Details</a>
+            <a asp-action="Delete" asp-route-id="@item.PerID">Delete</a>
+        </td>    
     </tr>
 }
+    </tbody>
 </table>
