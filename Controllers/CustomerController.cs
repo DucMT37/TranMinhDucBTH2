@@ -52,8 +52,8 @@ namespace TranMinhDucBTH2.Controllers
                             var cus = new Customer();
 
                             cus.CusID = dt.Rows[i][0].ToString();
-                            cus.CusName = dt.Rows[i][0].ToString();
-                            cus.CusAddress = dt.Rows[i][0].ToString();
+                            cus.CusName = dt.Rows[i][1].ToString();
+                            cus.CusAddress = dt.Rows[i][2].ToString();
 
                             _context.Customer.Add(cus);
                         }

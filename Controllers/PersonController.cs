@@ -52,8 +52,8 @@ namespace TranMinhDucBTH2.Controllers
                             var per = new Person();
 
                             per.PerID = dt.Rows[i][0].ToString();
-                            per.PerName = dt.Rows[i][0].ToString();
-                            per.PerAddress = dt.Rows[i][0].ToString();
+                            per.PerName = dt.Rows[i][1].ToString();
+                            per.PerAddress = dt.Rows[i][2].ToString();
 
                             _context.Person.Add(per);
                         }

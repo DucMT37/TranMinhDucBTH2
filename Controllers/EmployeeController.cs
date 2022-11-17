@@ -52,8 +52,8 @@ namespace TranMinhDucBTH2.Controllers
                             var emp = new Employee();
 
                             emp.EmpID = dt.Rows[i][0].ToString();
-                            emp.EmpName = dt.Rows[i][0].ToString();
-                            emp.EmpAddress = dt.Rows[i][0].ToString();
+                            emp.EmpName = dt.Rows[i][1].ToString();
+                            emp.EmpAddress = dt.Rows[i][2].ToString();
 
                             _context.Employee.Add(emp);
                         }

@@ -7,12 +7,12 @@ namespace TranMinhDucBTH2.Data
     {
         public ApplicationDbContext ( DbContextOption<ApplicationDbContext> option) : base(options)
         {
+            public DbSet<TranMinhDucBTH2.Models.Student> Student {get; set; }
+            public DbSet<TranMinhDucBTH2.Models.Employee> Employee {get; set; }
+            public DbSet<TranMinhDucBTH2.Models.Person> Person {get; set; }
+            public DbSet<TranMinhDucBTH2.Models.Customer> Customer {get; set; }
+            public DbSet<TranMinhDucBTH2.Models.Faculty> Employee {get; set; } = default!;
 
         }
-
-        public DbSet<Student> Student {get; set; }
-        public DbSet<TranMinhDucBTH2.Models.Employee> Employee {get; set; }
-        public DbSet<Person> Person {get; set; }
-        public DbSet<Customer> Customer {get; set; }
     }
 }

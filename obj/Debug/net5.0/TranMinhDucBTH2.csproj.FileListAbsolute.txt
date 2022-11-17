@@ -1,0 +1,8 @@
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.csprojAssemblyReference.cache
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.GeneratedMSBuildEditorConfig.editorconfig
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.AssemblyInfoInputs.cache
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.AssemblyInfo.cs
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.csproj.CoreCompileInputs.cache
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.MvcApplicationPartsAssemblyInfo.cache
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.RazorAssemblyInfo.cache
+D:\TranMinhDucBTH2\obj\Debug\net5.0\TranMinhDucBTH2.RazorAssemblyInfo.cs

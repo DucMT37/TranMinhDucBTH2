@@ -6,11 +6,14 @@ namespace TranMinhDucBTH2.Models
     {
         [Key]
 
-        public string StdID {get; set; }
+        public string StdID { get; set; }
 
-        public string StdName {get; set; }
+        public string StdName { get; set; }
 
-        public string Address {get; set; }
+        public string FacultyID { get; set; }
+        [ForeignKey("FacultyID")]
+
+        public Faculty? Faculty { get; set; }
 
     }
 }
